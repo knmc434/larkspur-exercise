@@ -15,3 +15,5 @@ decides in the moment who does what.
 - Meet Lad
 - HariLM
 - Meghesh Kumar
+- Shashi Kant Sahu
+- Suganthi RS
