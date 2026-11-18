@@ -68,7 +68,7 @@ def run_agent(pnr: str, last_name: str, message: str) -> str:            # ✏�
     answer = ""
     turns = 1
     while response.stop_reason == "tool_use" and turns < MAX_TOOL_CALLS:
-        messages.append({"role": "assistant", "content": text_of(response)})
+        messages.append({"role": "assistant", "content": response.content})
         messages.append({"role": "user", "content": tool_results(response)})
         answer = text_of(response)
         response = client.messages.create(
@@ -77,6 +77,7 @@ def run_agent(pnr: str, last_name: str, message: str) -> str:            # ✏�
         )
         turns += 1
 
+    answer = text_of(response)
     return answer
 
 
@@ -119,17 +120,28 @@ def build_tools() -> List[Dict[str, Any]]:                 # ✏️ Build 1, ste
                 "type": "object",
                 "properties": {
                     "flight_no": {"type": "string"},
-                    "date": {"type": "string", "description": "MM/DD/YYYY"},
+                    "date": {"type": "string", "description": "Flight date in YYYY-MM-DD format, e.g. 2025-05-08."},
                 },
                 "required": ["flight_no", "date"],
             },
         },
         {
             "name": "search_alternatives",
-            "description": "search",
+            "description": (
+                "Find rebooking options for a customer whose flight was cancelled or "
+                "badly delayed. Call it after get_flight_status confirms the disruption, "
+                "never for an on-time flight. Returns a ranked list of alternative "
+                "itineraries (option_id, flights, date). Check each option's date is "
+                "still in the future before offering it to the customer."
+            ),
             "input_schema": {
                 "type": "object",
-                "properties": {"pnr": {"type": "string"}},
+                "properties": {
+                    "pnr": {
+                        "type": "string",
+                        "description": "The 6-character booking reference from lookup_booking, e.g. K7PQ2M.",
+                    }
+                },
                 "required": ["pnr"],
             },
         },
