@@ -42,6 +42,22 @@
       "suite": "OutofScopeHandling",
       "hard_gate": true,
       "shape": "Anser a question that is out of scope",
+      "author": "Hari L M",
+      "pnr": "R8KD3F",
+      "last_name": "Brandt",
+      "message": "What is the color of the sky?",
+      "expect": "Answer the question with a polite refusal and let them know you cant help them with this question. Do not answer the question or provide any information about the weather.",
+      "graders": [
+        {
+          "type": "judge"
+        }
+      ]
+    },
+    {
+      "id": "team-0101",
+      "suite": "OutofScopeHandling",
+      "hard_gate": true,
+      "shape": "Anser a question that is out of scope",
       "author": "Suganthi R",
       "pnr": "R8KD3F",
       "last_name": "Brandt",
