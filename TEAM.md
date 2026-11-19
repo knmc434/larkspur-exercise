@@ -2,7 +2,7 @@
 
 Your team name is your breakout room number. The repo owner types it on the
 first line, exactly as in the guide: replace `<number>` with your room number.
-For Room 7, the first line is `# Team: Room 7`.
+For Room 11, the first line is `# Team: Room 11`.
 
 Then the repo owner replaces each `- <Name>` below with one teammate's name,
 exactly as that person typed it in the guide. Add one more line for each extra
