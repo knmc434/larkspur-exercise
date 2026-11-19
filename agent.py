@@ -11,37 +11,14 @@ Steps and gates:  https://anthropicpartnerbasecamp.bts.com/
 from __future__ import annotations
 from typing import Any, Dict, List
 from support import (MODEL, SYSTEM_PROMPT, call_local, execute_tool, mcp_client,
-                     new_session, next_available_day, record_tool_result,
-                     runtime_preamble)
+                     new_session, record_tool_result, runtime_preamble)
 
 MAX_TOOL_CALLS = 8  # Larkspur's own build capped the loop here; then a human takes over.
 
 TONE_ADDENDUM = ""                       # ✏️ Build 4, step 4.1, intelligence goal
-EXTRA_TOOLS: List[Dict[str, Any]] = [    # ✏️ Build 2, step 2.1: schemas for the tools you add
-    {
-        "name": "next_available_day",
-        "description": (
-            "Find the earliest date that has an open seat on a route. Call it when the "
-            "customer asks when the next available flight is, or when the dates "
-            "search_alternatives returned are not usable. Needs origin, dest and the "
-            "date to search from, which you get from lookup_booking and "
-            "get_flight_status. Returns the earliest date with an open seat."
-        ),
-        "input_schema": {
-            "type": "object",
-            "properties": {
-                "origin": {"type": "string", "description": "Origin airport IATA code, e.g. DEN."},
-                "dest": {"type": "string", "description": "Destination airport IATA code, e.g. AUS."},
-                "date": {"type": "string", "description": "Date to search from, in YYYY-MM-DD format, e.g. 2025-05-08."},
-                "cabin": {"type": "string", "description": "Cabin code, defaults to Y (economy)."},
-            },
-            "required": ["origin", "dest", "date"],
-        },
-    },
-]
-LOCAL_TOOLS: Dict[str, Any] = {          # ✏️ Build 2, step 2.1: the functions behind them
-    "next_available_day": next_available_day,
-}
+# MCP owns next_available_day and fare_rules; do not register local copies.
+EXTRA_TOOLS: List[Dict[str, Any]] = []
+LOCAL_TOOLS: Dict[str, Any] = {}
 
 
 def text_of(response) -> str:
@@ -105,15 +82,14 @@ def run_agent(pnr: str, last_name: str, message: str) -> str:            # ✏�
 
 
 def tool_list() -> List[Dict[str, Any]]:                   # ✏️ Build 2, step 2.2
-    """Given. Exactly what Claude is offered on every turn; run.py --show-tools
-    prints this list."""
-    return build_tools() + EXTRA_TOOLS
+    """Offer the built-in tools, any local additions, and tools discovered over MCP."""
+    return build_tools() + EXTRA_TOOLS + mcp_client.tools()
 
 
-# ──────────────────────────────────────────────────────────────────────────────
+# ────────────────────────────────────────────────────────────────�[...]
 # Below this line: what Claude is told about each tool. Step 1.3.
 # The functions these describe are written and correct, in support/tools.py.
-# ──────────────────────────────────────────────────────────────────────────────
+# ────────────────────────────────────────────────────────────────�[...]
 def build_tools() -> List[Dict[str, Any]]:                 # ✏️ Build 1, step 1.3
     """Anthropic-shaped schemas: name, description, input_schema. What Claude is
     told about each of the nine tools, and all it is ever told."""
